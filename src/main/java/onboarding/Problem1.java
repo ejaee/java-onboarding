@@ -2,24 +2,23 @@ package onboarding;
 
 import java.util.List;
 
+
 class Problem1 {
 
-  static final int EXCEPTION = -1;
-  static final int DRAW = 0;
-  static final int POBIWIN = 1;
-  static final int CRONGWIN = 2;
-
+  private static final int EXCEPTION = -1;
+  private static final int DRAW = 0;
+  private static final int POBI_WIN = 1;
+  private static final int CRONG_WIN = 2;
 
   public static int solution(List<Integer> pobi, List<Integer> crong) {
     if (isNotValidPage(pobi) || isNotValidPage(crong)) {
       return EXCEPTION;
     }
 
-    int pobiNum = getBiggestNum(pobi);
-    int crongNum = getBiggestNum(crong);
+    int pobiMaxNumber = getBiggestNum(pobi);
+    int crongMaxNumber = getBiggestNum(crong);
 
-    int res = getWinner(pobiNum, crongNum);
-    return res;
+    return getWinner(pobiMaxNumber, crongMaxNumber);
   }
 
   //  가독성, 의존성, value 값
@@ -117,9 +116,9 @@ class Problem1 {
 
   private static int getWinner(int pobiNum, int crongNum) {
     if (pobiNum > crongNum) {
-      return (POBIWIN);
+      return (POBI_WIN);
     } else if (pobiNum < crongNum) {
-      return (CRONGWIN);
+      return (CRONG_WIN);
     }
     return (DRAW);
   }
