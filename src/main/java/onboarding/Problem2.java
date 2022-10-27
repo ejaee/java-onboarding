@@ -3,9 +3,11 @@ package onboarding;
 import java.util.regex.Pattern;
 
 public class Problem2 {
+
   private static boolean duplicateFlag;
   private static int start;
   private static int end;
+
   public static String solution(String cryptogram) {
     if (isNotValidCryptogram(cryptogram)) {
       return (cryptogram);
@@ -49,20 +51,21 @@ public class Problem2 {
     while (duplicateFlag) {
       duplicateFlag = false;
       getIndex(sb.toString());
-      if (duplicateFlag)
+      if (duplicateFlag) {
         sb.delete(start, end + 1);
-      System.out.println(sb);
       }
+      System.out.println(sb);
+    }
     return sb.toString();
   }
+
   private static void getIndex(String str) {
     for (int i = 0; i < str.length() - 1; i++) {
       if (!duplicateFlag && str.charAt(i) == str.charAt(i + 1)) {
         duplicateFlag = true;
         start = i;
         end = i + 1;
-      }
-      else if (duplicateFlag && str.charAt(i) == str.charAt(i + 1)) {
+      } else if (duplicateFlag && str.charAt(i) == str.charAt(i + 1)) {
         end = i + 1;
       }
     }
