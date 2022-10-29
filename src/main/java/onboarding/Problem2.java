@@ -54,7 +54,6 @@ public class Problem2 {
       if (duplicateFlag) {
         sb.delete(start, end + 1);
       }
-      System.out.println(sb);
     }
     return sb.toString();
   }
