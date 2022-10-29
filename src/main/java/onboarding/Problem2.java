@@ -5,16 +5,22 @@ import java.util.regex.Pattern;
 public class Problem2 {
 
   private static boolean duplicateFlag;
+  private static int STRING_MIN_LENGTH = 1;
+  private static int STRING_MAX_LENGTH = 1000;
   private static int start;
   private static int end;
 
   public static String solution(String cryptogram) {
-    if (isNotValidCryptogram(cryptogram)) {
-      return (cryptogram);
-    }
+    validityChecker(cryptogram);
+
     return modifyString(cryptogram);
   }
 
+  private static void validityChecker(String cryptogram) {
+    if (isNotValidCryptogram(cryptogram)) {
+      throw new IllegalArgumentException("Not valid cryptogram");
+    }
+  }
   /**
    * 알맞은 매개변수가 전달되었는지 확인
    *
@@ -22,16 +28,13 @@ public class Problem2 {
    * @return true/ false
    */
   private static boolean isNotValidCryptogram(String cryptogram) {
-    return !(isValidLength(cryptogram));
+    return !isValidLength(cryptogram) || !isVaildCompo(cryptogram);
   }
 
   private static boolean isValidLength(String cryptogram) {
     int stringLength = cryptogram.length();
 
-    if (stringLength < 1 || stringLength > 1000) {
-      return false;
-    }
-    return (isVaildCompo(cryptogram));
+    return STRING_MIN_LENGTH <= stringLength && stringLength <= STRING_MAX_LENGTH;
   }
 
   private static boolean isVaildCompo(String cryptogram) {

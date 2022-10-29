@@ -24,12 +24,8 @@ class Problem1 {
   }
 
   private static boolean isNotValidPage(List<Integer> pages) {
-    if (!isValidRange(pages)) {
-      return (true);
-    } else if (!isValidOddEven(pages)) {
-      return (true);
-    } else if (!isValidInterval(pages)) {
-      return (true);
+    if (!isValidRange(pages) || !isValidOddEven(pages) || !isValidInterval(pages)) {
+      return true;
     }
     return false;
   }
@@ -40,8 +36,9 @@ class Problem1 {
     for (int page : pages) {
       checker = checker && isContained(page);
     }
-    if (checker)
+    if (checker) {
       return true;
+    }
     return false;
   }
 
@@ -59,9 +56,7 @@ class Problem1 {
     int leftPage = pages.get(0);
     int rightPage = pages.get(1);
 
-    if (leftPage % 2 == 0) {
-      return false;
-    } else if (rightPage % 2 == 1) {
+    if (leftPage % 2 == 0 || rightPage % 2 == 1) {
       return false;
     }
     return true;
