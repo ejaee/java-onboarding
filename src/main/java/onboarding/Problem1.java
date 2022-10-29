@@ -9,6 +9,8 @@ class Problem1 {
   private static final int DRAW = 0;
   private static final int POBI_WIN = 1;
   private static final int CRONG_WIN = 2;
+  private static final int FIRST_PAGE = 1;
+  private static final int LAST_PAGE = 400;
 
   public static int solution(List<Integer> pobi, List<Integer> crong) {
     if (isNotValidPage(pobi) || isNotValidPage(crong)) {
@@ -21,14 +23,6 @@ class Problem1 {
     return getWinner(pobiMaxNumber, crongMaxNumber);
   }
 
-  //  가독성, 의존성, value 값
-  /*
-  타당하지 않은 페이지를 확인   isNotValidPage()
-  1. 허용 범위를 벗어나는가     isValidRange()
-  2. 올바른 홀, 짝수인가      isValidOddEven()
-  3. 두 페이지간의 차이가 1인가 isValidInterval()
-  (고민중) 6번규칙의 첫페이지, 마지막페이지에 대한 고민 [1,2], [399,400]
-   */
   private static boolean isNotValidPage(List<Integer> pages) {
     if (!isValidRange(pages)) {
       return (true);
@@ -41,14 +35,18 @@ class Problem1 {
   }
 
   private static boolean isValidRange(List<Integer> pages) {
-    for (int pageNumber : pages) {
-      if (pageNumber < 1) {
-        return false;
-      } else if (pageNumber > 400) {
-        return false;
-      }
+    boolean checker = true;
+
+    for (int page : pages) {
+      checker = checker && isContained(page);
     }
-    return true;
+    if (checker)
+      return true;
+    return false;
+  }
+
+  private static boolean isContained(int page) {
+    return FIRST_PAGE <= page && page <= LAST_PAGE;
   }
 
   /*
@@ -73,10 +71,7 @@ class Problem1 {
     int leftPage = pages.get(0);
     int rightPage = pages.get(1);
 
-    if (rightPage - leftPage != 1) {
-      return false;
-    }
-    return true;
+    return rightPage - leftPage == 1;
   }
 
   private static int getBiggestNum(List<Integer> pages) {
