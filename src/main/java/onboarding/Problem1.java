@@ -16,7 +16,6 @@ class Problem1 {
     if (isNotValidPage(pobi) || isNotValidPage(crong)) {
       return EXCEPTION;
     }
-
     int pobiMaxNumber = getBiggestNum(pobi);
     int crongMaxNumber = getBiggestNum(crong);
 
