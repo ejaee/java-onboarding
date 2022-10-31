@@ -1,111 +1,256 @@
 package onboarding;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+class Person implements Comparable<Person> {
+
+  public String name;
+  public int point;
+
+  public Person(String name) {
+    this.name = name;
+  }
+
+  public Person(String name, int point) {
+    this.name = name;
+    this.point = point;
+  }
+
+  public void addOnePoint() {
+    this.point += 1;
+  }
+
+  public void addTenPoint() {
+    this.point += 10;
+  }
+
+  public String getNameAsString() {
+    return this.name;
+  }
+
+  public Integer getPointAsInteger() {
+    return this.point;
+  }
+
+  @Override
+  public int compareTo(Person p) {
+    if (getPointAsInteger() < p.getPointAsInteger()) {
+      return 1;
+    } else if (getPointAsInteger() < p.getPointAsInteger()) {
+      return -1;
+    } else {
+      int compareString = getNameAsString().compareTo(p.getNameAsString());
+      if (compareString == 1) {
+        return 1;
+      } else if (compareString == -1) {
+        return -1;
+      }
+    }
+    return 0;
+  }
+
+  @Override
+  public String toString() {
+    return "name : " + name + "point : " + point;
+  }
+
+  @Override
+  public boolean equals(Object a) {
+    Person obj = (Person) a;
+    return (obj.getNameAsString() == this.getNameAsString());
+  }
+
+}
 
 public class Problem7 {
-    public static final int ONE_POINT = 1;
-    public static final int TEN_POINT = 10;
-    public static final int RECOMMEND_MAX_CNT = 5;
+  private static final int VISITORS_MIN_SIZE = 0;
+  private static final int VISITORS_MAX_SIZE = 10000;
+  private static final int FRIENDS_RELATION_MIN_SIZE = 1;
+  private static final int FRIENDS_RELATION_MAX_SIZE = 10000;
+  public static List<String> solution(String user, List<List<String>> friends,
+      List<String> visitors) {
+    vaildityChecker(user, friends, visitors);
 
-    static class Person {
+    List<String> userFriends = new ArrayList<>();
+    getUserFriends(user, friends, userFriends);
+    List<Person> answerList = getTenPointName(user, friends, userFriends);
+    getOnePointName(answerList, visitors, userFriends);
+    listSort(answerList);
+    List<String> answer = new ArrayList<>();
+    makeAnswer(answerList, answer);
+    return answer;
+  }
+  private static void vaildityChecker(String user, List<List<String>> friends,
+      List<String> visitors) {
+    userChecker(user);
+    friendsChecker(friends);
+    visitorsChecker(visitors);
+  }
+  private static void userChecker(String user) {
+    checkLength(user, user.length());
+    checkConsistOfLowerCase(user);
+  }
+  private static void checkLength(String type, int length) {
+    if (length < 1 || 30 < length) {
+      throw new IllegalArgumentException(type+"는 길이가 1 이상 30 이하인 문자열이어야 합니다.");
+    }
+  }
 
-        private final String name;
-        private int point = 0;
+  private static void friendsChecker(List<List<String>> friends) {
+    checkSize("friendRelation", friends.size(), FRIENDS_RELATION_MIN_SIZE, FRIENDS_RELATION_MAX_SIZE);
+    checkFriendRelation(friends);
+    for (List<String> friendRelation : friends) {
+      checkElements(friendRelation);
+      checkOverlapFriendRelation(friendRelation);
+    }
+  }
+  private static void checkOverlapFriendRelation(List<String> friends) {
+    String leftUser = friends.get(0);
+    String rightUser = friends.get(1);
 
-        public Person(String name) {
-            this.name = name;
-        }
-
-        public Person(String name, int point) {
-            this(name);
-            this.point = point;
-        }
-
-        public void plusOnePoint() {
-            this.point += ONE_POINT;
-        }
-
-        public int getPoint() {
-            return point;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Person person = (Person) o;
-            return Objects.equals(name, person.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name);
-        }
+    if (Pattern.matches(leftUser, rightUser)) {
+      throw new IllegalArgumentException("동일한 친구 관계가 중복해서 주어지면 안됩니다.");
     }
 
-    public static List<String> solution(String user, List<List<String>> friends, List<String> visitors) {
-        List<String> answer = new ArrayList<>();
-        List<Person> userFriends = getUserFriends(new Person(user), friends); // 사용자의 친구
+  }
+  private static void checkSize(String type, int size, int minSize, int maxSize) {
+    if (size < minSize || maxSize < size) {
+      throw new IllegalArgumentException(type+"는 길이가 1 이상 10,000 이하인 리스트/배열이어야 합니다.");
+    }
+  }
+  private static void checkFriendRelation(List<List<String>> friends) {
+    for (List<String> friendRelation : friends) {
+      String leftUser = friendRelation.get(0);
+      String rightUser = friendRelation.get(1);
 
-        List<Person> targetList = handleMutualFriends(user, userFriends, friends); // 사용자와 함께 아는 친구 처리
-        handleVisitors(visitors, userFriends, targetList); // 방문자 처리
-
-        sort(targetList); // point를 기준으로 내림차순 정렬
-
-        for (Person p : targetList) {
-            isValid(answer, p); // 최대 5개, point != 0, point가 같다면 이름으로 정렬
-        }
-
-        return answer;
+      checkLength("friendsElement", leftUser.length());
+      checkLength("friendsElement", rightUser.length());
+    }
+  }
+  private static void visitorsChecker(List<String> visitors) {
+    checkSize("visitors", visitors.size(), VISITORS_MIN_SIZE, VISITORS_MAX_SIZE);
+    checkElements(visitors);
+  }
+  private static void checkElements(List<String> names) {
+    for (String name : names) {
+      checkConsistOfLowerCase(name);
     }
 
-    private static List<Person> getUserFriends(Person user, List<List<String>> friends) {
-        List<Person> list = new ArrayList<>();
-        for (List<String> friend : friends) {
-            Person a = new Person(friend.get(0)), b = new Person(friend.get(1));
-            if (a.equals(user)) list.add(b);
-            else if (b.equals(user)) list.add(a);
-        }
-        return list;
+  }
+  private static void checkConsistOfLowerCase(String name) {
+    if (!Pattern.matches("^[a-z]*$", name)) {
+      throw new IllegalArgumentException("사용자 아이디는 알파벳 소문자로만 이루어져 있어야 합니다.");
     }
+  }
+  private static void getUserFriends(String user, List<List<String>> friends,
+      List<String> userFriends) {
+    for (List<String> names : friends) {
+      if (names.contains(user)) {
+        userFriends.add(setUserFriends(user, names.get(0), names.get(1)));
+      }
+    }
+  }
 
-    private static List<Person> handleMutualFriends(String user, List<Person> userFriends, List<List<String>> friends) {
-        Set<Person> set = new HashSet<>();
-        for (List<String> friend : friends) {
-            if (!friend.contains(user)) {
-                Person a = new Person(friend.get(0), TEN_POINT), b = new Person(friend.get(1), TEN_POINT); // 10점씩 기본 셋팅
-                if (userFriends.contains(a)) set.add(b);
-                else if (userFriends.contains(b)) set.add(a);
-            }
-        }
-        return new ArrayList<>(set);
+  private static String setUserFriends(String user, String leftName, String rightName) {
+    if (leftName.contains(user)) {
+      return rightName;
     }
+    return leftName;
+  }
 
-    private static void handleVisitors(List<String> visitors, List<Person> userFriends, List<Person> targetList) {
-        for (String friend : visitors) {
-            Person p = new Person(friend, ONE_POINT);
-            if (targetList.contains(p)) {
-                targetList.get(targetList.indexOf(p)).plusOnePoint();
-            } else if (!userFriends.contains(p)) {
-                targetList.add(p);
-            }
-        }
-    }
+  private static List<Person> getTenPointName(String user, List<List<String>> friends,
+      List<String> userFriends) {
+    List<Person> tenPointNames = new ArrayList<>();
 
-    private static void sort(List<Person> targetList) {
-        Collections.sort(targetList, (a, b) -> {
-            if (a.getPoint() == b.getPoint()) return a.getName().compareTo(b.getName());
-            return Integer.compare(b.point, a.point);
-        });
+    for (List<String> names : friends) {
+      if (!names.contains(user)) {
+        setTenPointName(names, userFriends, tenPointNames);
+      }
     }
+    return tenPointNames;
+  }
 
-    private static void isValid(List<String> answer, Person p) {
-        if (p.getPoint() != 0 && answer.size() < RECOMMEND_MAX_CNT) {
-            answer.add(p.getName());
-        }
+  private static void setTenPointName(List<String> names, List<String> userFriends,
+      List<Person> tenPointNames) {
+    Person leftFriend = new Person(names.get(0));
+    Person rightFriend = new Person(names.get(1));
+
+    if (userFriends.contains(leftFriend.name) && !userFriends.contains(rightFriend.name)) {
+      addFriend(tenPointNames, rightFriend);
+    } else if (!userFriends.contains(leftFriend.name) && userFriends.contains(rightFriend.name)) {
+      addFriend(tenPointNames, leftFriend);
     }
+  }
+
+  private static void addFriend(List<Person> tenPointNames, Person friend) {
+    if (tenPointNames.isEmpty()) {
+      friend.addTenPoint();
+      tenPointNames.add(friend);
+    }
+    else if (!isContainedFriend(tenPointNames, friend)) {
+      friend.addTenPoint();
+      tenPointNames.add(friend);
+    }
+  }
+  private static boolean isContainedFriend(List<Person> tenPointNames, Person friend) {
+    for (Person list : tenPointNames) {
+      if (list.equals(friend)) {
+        list.addTenPoint();
+        return true;
+      }
+    }
+    return false;
+  }
+  private static boolean isContainedName(List<Person> members, String name) {
+    for (Person member : members) {
+      if (name.equals(member.name)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  private static void getOnePointName(List<Person> answerList, List<String> visitors, List<String> userFriends) {
+    for (String visitor : visitors) {
+      if (isContainedName(answerList, visitor) && !isAlreadyFriend(userFriends, visitor)) {
+        setOnePointName(answerList, visitor);
+      } else if (!isContainedName(answerList, visitor) && !isAlreadyFriend(userFriends, visitor)){
+        answerList.add(new Person(visitor, 1));
+      }
+    }
+  }
+  private static boolean isAlreadyFriend(List<String> userFriends, String visitor) {
+    for (String userFriend : userFriends) {
+      if (userFriend.equals(visitor)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  private static void setOnePointName(List<Person> answerList, String visitor) {
+    for (Person member : answerList) {
+      if (visitor.equals(member.name)) {
+        member.addOnePoint();
+        break;
+      }
+    }
+  }
+
+  private static void listSort(List<Person> answerList) {
+    Collections.sort(answerList);
+  }
+
+  private static void makeAnswer(List<Person> answerList, List<String> answer) {
+    for (Person friend : answerList) {
+      answer.add(friend.name);
+    }
+  }
 }
