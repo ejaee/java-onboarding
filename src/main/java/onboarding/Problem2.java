@@ -62,14 +62,17 @@ public class Problem2 {
   }
 
   private static void getIndex(String str) {
+    char preCh = 0;
+
     for (int i = 0; i < str.length() - 1; i++) {
       if (!duplicateFlag && str.charAt(i) == str.charAt(i + 1)) {
         duplicateFlag = true;
         start = i;
-        end = i + 1;
-      } else if (duplicateFlag && str.charAt(i) == str.charAt(i + 1)) {
-        end = i + 1;
+        preCh = str.charAt(i);
+      } else if (duplicateFlag && preCh != str.charAt(i + 1)) {
+          break;
       }
+      end = i + 1;
     }
   }
 }
