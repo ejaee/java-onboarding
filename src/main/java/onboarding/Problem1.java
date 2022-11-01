@@ -23,7 +23,11 @@ class Problem1 {
   }
 
   private static boolean isNotValidPage(List<Integer> pages) {
-    if (!isValidRange(pages) || !isValidOddEven(pages) || !isValidInterval(pages)) {
+    if (!isValidSize(pages) || !isValidRange(pages)) {
+      return true;
+    }
+
+    if (!isValidOddEven(pages) || !isValidInterval(pages)) {
       return true;
     }
     return false;
@@ -40,17 +44,13 @@ class Problem1 {
     }
     return false;
   }
-
+  private static boolean isValidSize(List<Integer> pages) {
+    return pages.size() == 2;
+  }
   private static boolean isContained(int page) {
-    return FIRST_PAGE <= page && page <= LAST_PAGE;
+    return FIRST_PAGE < page && page < LAST_PAGE;
   }
 
-  /*
-  올바른 홀, 짝수인지 확인
-  1. 왼쪽이 홀수인가
-  2. 오른쪽이 짝수인가
-  3. 페이지간의 차이가 1인가
-  */
   private static boolean isValidOddEven(List<Integer> pages) {
     int leftPage = pages.get(0);
     int rightPage = pages.get(1);
